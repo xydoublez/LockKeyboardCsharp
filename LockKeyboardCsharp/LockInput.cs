@@ -5,6 +5,8 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Reflection;
 using System.IO;
+using Microsoft.Win32;
+using System.Windows.Forms;
 
 namespace LockKeyboardCsharp
 {
@@ -87,14 +89,61 @@ namespace LockKeyboardCsharp
             Boolean GetKeyboardState = Win32.GlobalFindAtom(Win32.ATOM_FLAG) != 0;
             return GetKeyboardState;
         }
+        private void KillCtrlAltDelete()
+        {
+            RegistryKey regkey;
+            string keyValueInt = "1";
+            string subKey = @"Software\Microsoft\Windows\CurrentVersion\Policies\System";
 
+            try
+            {
+                regkey = Registry.CurrentUser.CreateSubKey(subKey);
+                regkey.SetValue("DisableTaskMgr", keyValueInt);
+                regkey.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+        private static void EnableCTRLALTDEL()
+        {
+            try
+            {
+                string subKey = @"Software\Microsoft\Windows\CurrentVersion\Policies\System";
+                RegistryKey rk = Registry.CurrentUser;
+                RegistryKey sk1 = rk.OpenSubKey(subKey);
+                if (sk1 != null)
+                    rk.DeleteSubKeyTree(subKey);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
         private int LowLevelKeyboardProc(int nCode, WM wParam, KBDLLHOOKSTRUCT lParam)
         {
           
             if (nCode == 0)
             {
-           
                 System.Diagnostics.Trace.WriteLine(lParam.vkCode);
+                //bool flag;
+                //switch ((uint)wParam)
+                //{
+                //    case 256:
+                //    case 257:
+                //    case 260:
+                //    case 261:
+                //        //Alt+Tab, Alt+Esc, Ctrl+Esc, Windows Key,
+                //        flag = ((lParam.vkCode == 9) && ((uint)lParam.flags == 32))
+                //            | ((lParam.vkCode == 27) && ((uint)lParam.flags == 32)) 
+                //            | ((lParam.vkCode == 27) && ((uint)lParam.flags == 0))
+                //            | ((lParam.vkCode == 91) && ((uint)lParam.flags == 1))
+                //            | ((lParam.vkCode == 92) && ((uint)lParam.flags == 1)) 
+                //            | ((lParam.vkCode == 73) && ((uint)lParam.flags == 0));
+                //        return 1;
+                //}
+                
                 return 1;
             }
             else
