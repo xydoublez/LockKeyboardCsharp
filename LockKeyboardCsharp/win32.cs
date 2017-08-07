@@ -152,7 +152,7 @@ namespace LockKeyboardCsharp
         public static extern bool BlockInput(bool fBlockIt);
 
     }
-    internal delegate int HookProc(int code, IntPtr wParam, IntPtr lParam);
+    internal delegate int HookProc(int code, WM wParam, KBDLLHOOKSTRUCT lParam);
     internal delegate int ThreadProc(IntPtr param);
     internal enum HookType : int
     {

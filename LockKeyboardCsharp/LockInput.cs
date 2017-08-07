@@ -17,7 +17,7 @@ namespace LockKeyboardCsharp
 
             if (isLock)
             {
-                m_lHookID = Win32.SetWindowsHookEx(HookType.WH_KEYBOARD_LL, new HookProc(LowLevelKeyboardProc), Marshal.GetHINSTANCE(Assembly.GetExecutingAssembly().GetModules()[0]), 0);
+                m_lHookID = Win32.SetWindowsHookEx(HookType.WH_KEYBOARD_LL, LowLevelKeyboardProc, Marshal.GetHINSTANCE(Assembly.GetExecutingAssembly().GetModules()[0]), 0);
 
 
             }
@@ -88,17 +88,18 @@ namespace LockKeyboardCsharp
             return GetKeyboardState;
         }
 
-        private int LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam)
+        private int LowLevelKeyboardProc(int nCode, WM wParam, KBDLLHOOKSTRUCT lParam)
         {
-            KBDLLHOOKSTRUCT KBEvent = new KBDLLHOOKSTRUCT();
+          
             if (nCode == 0)
             {
-                Marshal.StructureToPtr(KBEvent, lParam, true);
+           
+                System.Diagnostics.Trace.WriteLine(lParam.vkCode);
                 return 1;
             }
             else
             {
-                return Win32.CallNextHookEx(m_lHookID, nCode, wParam.ToInt32(), lParam.ToInt32()).ToInt32();
+                return Win32.CallNextHookEx(m_lHookID, nCode, wParam, lParam).ToInt32();
             }
         }
 
